@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:notestaking/constants.dart';
-import 'package:notestaking/screens/authenticate.dart';
-import 'package:notestaking/screens/sqlite.dart';
+import 'package:notestaking/authenticate.dart';
+import 'package:notestaking/sqlite.dart';
+
+import '../authenticate.dart';
+import '../sqlite.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -34,23 +37,76 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
 
+        appBar: AppBar(
+
+          title: Text('Notes', style: bheadings),
+          backgroundColor: backgroundColor,
+          elevation: 0.0,
+          
+  //centerTitle: true,
+          automaticallyImplyLeading: false,
+
+        ),
+
         body: SingleChildScrollView(
           child: Container(
-            margin: bmargintop,
+            //margin: bmargintop,
             padding: bpadding,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                Text('Notes', style: bheadings),
+                //Text('Notes', style: bheadings),
 
-                SizedBox(height: 24,),
+                //SizedBox(height: 24,),
 
-                InkWell(
-                  onTap: () {},
-                  child: Image.asset('images/search.png'),
-                ),
+
+                Container(
+
+                margin: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.white,
+                      boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 3), // changes position of shadow
+                      ),
+                    ],
+                  ),
+
+                child: TextField(
+                      //controller: search,
+                      onChanged: (value){
+                        //Searchevent(value);
+                      },
+                      
+                      decoration: InputDecoration(
+                          prefixIcon: Icon(Icons.search, color: Color.fromARGB(255, 85, 86, 85),),
+                          hintText: 'Search for note',
+                          filled: true,
+                          //fillColor: biconcolor,
+                          fillColor: Color.fromARGB(255, 69, 143, 72),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),    
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Color.fromARGB(255, 14, 147, 19)),
+                          ),
+                    
+                        ),
+                    ),
+              ),
+
+                // InkWell(
+                //   onTap: () {},
+                //   child: Image.asset('images/search.png'),
+                // ),
 
                 SizedBox(height: 24,),
 
@@ -105,9 +161,9 @@ class _HomeState extends State<Home> {
                   
                thisweek.isEmpty?
                Container(
-                height: 100,
+                height: 300,
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage('images/splash.png'), alignment: Alignment.center, fit: BoxFit.fill)
+                  image: DecorationImage(image: AssetImage('images/emptynote.png'), alignment: Alignment.center, fit: BoxFit.fill)
                 ),
               ): 
                SizedBox(
@@ -128,48 +184,71 @@ class _HomeState extends State<Home> {
                       auth.deletenotemessage(context,thisweek[index]['_id']);
                              getdata();
                    },
-                   child: Container(
-                     height: 200,
-                     width: 150,
+                   child: Card(
+                     
                      margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
-                     padding: EdgeInsets.all(5),
-                     decoration: BoxDecoration(
-                       color: Colors.primaries[index % Colors.primaries.length].shade400,
-                       borderRadius: BorderRadius.circular(10),
-                       boxShadow: [BoxShadow(
-                        color: Color.fromARGB(255, 223, 211, 211),
-                        offset: Offset(0.0, 4.0),
-                        blurRadius: 6.0,
+                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                     //color: Colors.primaries[index % Colors.primaries.length].shade400,
+                     color: cardColors[index % cardColors.length],
+                     elevation: 6,
+
+                     child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${thisweek[index]['Title'][0].toUpperCase()}${thisweek[index]['Title'].substring(1)}',
+                               //thisweek[index]['Title'],
+                              style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.black,),
+                            ),
+                            Divider(height: 10, thickness: 4, color: Colors.grey),
+                            SizedBox(height: 12),
+                            Expanded(
+                              child: Text(
+                                 thisweek[index]['notes'],
+                                  maxLines: null,
+                                  overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: Colors.black,fontSize: 16,letterSpacing: 0.5, height: 1.2,),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            
+                            Text(
+                              thisweek[index]['time'].toString(),
+                              style: TextStyle(fontSize: 12, color: Color.fromARGB(255, 36, 35, 35),letterSpacing: 0.5,),
+                            ),
+                          ],
                         ),
-                         ],
-                     ),
-                     child: Column(
-                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                       children: [
-                         ListTile(
-                           splashColor: Colors.black,
-                           style: ListTileStyle.drawer,
-                           title: Center(child: Text('TITLE: '+thisweek[index]['Title'], style: TextStyle(fontWeight: FontWeight.bold),)),
-                         ),
+                      ),
+                     
+                    //  child: Column(
+                    //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //    children: [
+                    //      ListTile(
+                    //        splashColor: Colors.black,
+                    //        style: ListTileStyle.drawer,
+                    //        title: Center(child: Text('TITLE: '+thisweek[index]['Title'], style: TextStyle(fontWeight: FontWeight.bold),)),
+                    //      ),
                          
-                         Expanded(child: Text(thisweek[index]['notes'],maxLines: 4, style: TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis,)),
-                         Text(thisweek[index]['time'].toString(),),
-                       ],
-                     ),
+                    //      Expanded(child: Text(thisweek[index]['notes'],maxLines: 4, style: TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis,)),
+                    //      Text(thisweek[index]['time'].toString(),),
+                    //    ],
+                    //  ),
                    ),
                       );
                       
                     },),
                  ),
                ),
-               SizedBox(height: 5,),
+               SizedBox(height: 25,),
             Text('Past Notes' ,style: bheadings,),
                 
               weeksago.isEmpty?
               Container(
-                height: 100,
+                height: 300,
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage('images/splash.png'), alignment: Alignment.center, fit: BoxFit.fill)
+                  image: DecorationImage(image: AssetImage('images/emptynote.png'), alignment: Alignment.center, fit: BoxFit.fill)
                 ),
               )
                :SizedBox(

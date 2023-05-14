@@ -1,9 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:intern/screens/bottom_bar.dart';
-import 'package:intern/screens/home.dart';
-import 'package:intern/screens/marie1.dart';
-import 'package:intern/sqlite.dart';
+import 'package:notestaking/screens/bottom_bar.dart';
+import 'package:notestaking/screens/home.dart';
+//import 'package:notestaking/screens/marie1.dart';
+import 'package:notestaking/sqlite.dart';
+import 'package:notestaking/sqlite.dart';
 
 class authenticate {
   final mysql = sqlite();

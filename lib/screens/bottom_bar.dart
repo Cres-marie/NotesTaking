@@ -3,6 +3,7 @@ import 'package:notestaking/constants.dart';
 import 'package:notestaking/screens/calculatorScreen.dart';
 import 'package:notestaking/screens/createNote.dart';
 import 'package:notestaking/screens/home.dart';
+import 'package:notestaking/screens/listScreen.dart';
 import 'package:notestaking/screens/searchScreen.dart';
 import 'package:notestaking/screens/todoScreen.dart';
 
@@ -18,7 +19,7 @@ class _BottomBarState extends State<BottomBar> {
 
   List _screens = [
     Home(),
-    Todo(),
+    ListScreen(),
     Search(),
     CreateNote(),
     Calculator()

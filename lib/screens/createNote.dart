@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:notestaking/constants.dart';
-import 'package:notestaking/screens/authenticate.dart';
+import 'package:notestaking/authenticate.dart';
 import 'package:notestaking/screens/bottom_bar.dart';
-import 'package:notestaking/screens/sqlite.dart';
+import 'package:notestaking/sqlite.dart';
+
+import '../authenticate.dart';
+import '../sqlite.dart';
 
 class CreateNote extends StatefulWidget {
   const CreateNote({super.key});
