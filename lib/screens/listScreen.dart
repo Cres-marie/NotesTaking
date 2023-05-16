@@ -12,6 +12,7 @@ class ListScreen extends StatefulWidget {
 class _ListScreenState extends State<ListScreen> {
   final search = TextEditingController();
   final mysql = sqlite();
+  final auth = authenticate();
   List<Map<String,dynamic>> events=[];
   List<Map<String, dynamic>> filtered_list =[];
   Future<void> getAllevents() async{
@@ -50,7 +51,7 @@ class _ListScreenState extends State<ListScreen> {
               //Text('Notes', style: bheadings),
               InkWell(
                   onTap: () {
-                   Navigator.pop(context);
+                  Navigator.of(context).pop();
                    // Navigator.push(context, MaterialPageRoute(builder: (context) => Navigator.pop(context),));
                   },
                   child: Image.asset('images/backicon.png'),
@@ -87,7 +88,7 @@ class _ListScreenState extends State<ListScreen> {
                         // Navigator.push(context, MaterialPageRoute(builder: (context) => mynote(note: filtered_list[index]),));
                        },
                        onLongPress: (){
-                          // auth.deletenotemessage(context,filtered_list[index]['_id']);
+                        auth.deletenotemessage(context,filtered_list[index]['_id'], false);
                           // getAllNotes();
                        },
                        child: Container(
@@ -96,7 +97,7 @@ class _ListScreenState extends State<ListScreen> {
                          margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
                          padding: EdgeInsets.all(5),
                          decoration: BoxDecoration(
-                           color: Colors.primaries[index % Colors.primaries.length].shade400,
+                           color: Colors.primaries[Random().nextInt(Colors.primaries.length)].withOpacity(0.5),
                            borderRadius: BorderRadius.circular(10),
                            boxShadow: [BoxShadow(
                             color: Color.fromARGB(255, 223, 211, 211),
