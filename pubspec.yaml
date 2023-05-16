@@ -38,6 +38,7 @@ dependencies:
   google_fonts: ^4.0.3
   table_calendar: ^3.0.9
   sqflite: ^2.2.8
+  awesome_notifications: ^0.6.19
 
 dev_dependencies:
   flutter_test:
