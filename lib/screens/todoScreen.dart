@@ -1,10 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:intern/Event.dart';
-import 'package:intern/authenticate.dart';
-import 'package:intern/notification.dart';
-import 'package:intern/sqlite.dart';
+
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import '../constants.dart';
