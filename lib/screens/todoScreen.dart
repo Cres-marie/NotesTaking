@@ -1,20 +1,27 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intern/Event.dart';
+import 'package:intern/authenticate.dart';
+import 'package:intern/notification.dart';
+import 'package:intern/sqlite.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import '../constants.dart';
 import 'listScreen.dart';
+
 //import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-class Calender extends StatefulWidget {
-  const Calender({super.key});
+class Todo extends StatefulWidget {
+  const Todo({super.key});
 
   @override
-  State<Calender> createState() => _CalenderState();
+  State<Todo> createState() => _TodoState();
 }
 
-class _CalenderState extends State<Calender> {
+class _TodoState extends State<Todo> {
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final mysql = sqlite();
   final popupmessage = authenticate();
   final _formkey = GlobalKey<FormState>();
@@ -68,7 +75,7 @@ Map<DateTime, List<Event>> selectedEvents={};
     if(dateortime){
       final datepicked = await showDatePicker(context: context, initialDate: initialdate, firstDate: DateTime.now(), lastDate: DateTime(2050));
       //final time = Duration(hours: initialdate.hour, minutes: initialdate.minute);
-      return datepicked!.toLocal();
+      return datepicked;
     }
     
     else{
@@ -92,7 +99,8 @@ Map<DateTime, List<Event>> selectedEvents={};
   @override
   void initState() {
     super.initState();
-    getdata();
+    getdata(); 
+ 
     //SmolleyNotification.initialize(fNp);
   }
   @override
@@ -104,36 +112,23 @@ Map<DateTime, List<Event>> selectedEvents={};
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        margin: bmargintop,
-        child: SingleChildScrollView(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+         flexibleSpace: ClipRect(child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(color: Colors.transparent,),),),
+        title: Center(child:Text('To Do', style: bheadings,),),
+         backgroundColor: Colors.white.withAlpha(150),
+        actions: [
+          IconButton(onPressed: (){
+             Navigator.push(context, MaterialPageRoute(builder: (context) => ListScreen(),));
+          }, icon: Icon(Icons.calendar_month, color:biconcolor ,))
+        ],
+      ),
+      body: SingleChildScrollView(
+        physics: BouncingScrollPhysics(parent:AlwaysScrollableScrollPhysics()),
+        child: SafeArea(
           child: Column(
             children: [
-          
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                InkWell(
-                  onTap: () {},
-                  child: Image.asset('images/backicon.png'),
-                ),
-          
-                
-          
-                Center(child: Text('To Do', style: bheadings,)),
-          
-                
-          
-                TextButton(
-                  onPressed: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => ListScreen(),));
-                  },
-                  child: Icon(Icons.event_note, size: 40,color: biconcolor,)
-                )
-          
-                ],
-              ),
-          
               TableCalendar(
                 calendarStyle: CalendarStyle(
                   defaultDecoration:  BoxDecoration(
@@ -198,7 +193,7 @@ Map<DateTime, List<Event>> selectedEvents={};
                   //CalendarFormat.week: 'Week',
                 },
                 selectedDayPredicate: (day) {
-        
+                    
                   return isSameDay(_selectedDay, day);
                 },
                 onDaySelected: (selectedDay, focusedDay) {
@@ -220,19 +215,18 @@ Map<DateTime, List<Event>> selectedEvents={};
                       });
                     };
                   },
-          
+                      
                   onPageChanged: (focusedDay) {
                   // No need to call `setState()` here
                     _focusedDay = focusedDay;
                   },
-          
+                      
                   
                 //availableGestures: AvailableGestures.none,
                 //CalendarFormat.month : 'Month',
               ),
           
-              SizedBox(height: 40,),
-              
+          
               ..._getEventsfromDay(_focusedDay).map((event) => Container(
                  height: 120,
                  width: 150,
@@ -272,7 +266,10 @@ Map<DateTime, List<Event>> selectedEvents={};
         onPressed: (){
         showDialog(context: context, builder: (context){
           DateTime time = DateTime.now();
-          DateTime date = DateTime.now();
+          final dDay = DateTime.utc(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+          DateTime date = dDay.toUtc();
+          bool remainder = false;
+          print(date);
          return StatefulBuilder(
            builder: (BuildContext context, void Function(void Function()) setState) { 
             return AlertDialog(
@@ -288,7 +285,8 @@ Map<DateTime, List<Event>> selectedEvents={};
                child: Form(
                key: _formkey,
                child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
                    TextFormField(
                            validator: (value) {
@@ -315,11 +313,10 @@ Map<DateTime, List<Event>> selectedEvents={};
                                 onTap: () async{
                                     final mydate = await pickdatetime(time, true);
                                     if(mydate == null) return null;
-                                    String thedate = mydate.toIso8601String() + 'Z';
-                                    DateTime finaldate = DateTime.parse(thedate);
-                                    print(finaldate);
+                                    final dDay = DateTime.utc(mydate.year, mydate.month, mydate.day).toUtc();
+                                    print(dDay);
                                     setState((){
-                                      date = finaldate;
+                                      date = dDay;
                                     } );
                                 },
                                 child: Text('Date: '+DateFormat.yMMMd().format(date))),
@@ -331,9 +328,17 @@ Map<DateTime, List<Event>> selectedEvents={};
                                  setState(()=> time = DateTime(date.year, date.month, date.day, mydate.hour, mydate.minute));
                               },
                               child: Text('Time: '+DateFormat.Hm().format(time))),
-                            
                           ],
-                         )
+                         ),
+                          SizedBox(height: 20,),
+                         Divider(color: Colors.grey,),
+                         
+                           SwitchListTile(
+                            title: Text('Remind me daily'),
+                            value: remainder, onChanged: (value){
+                                  setState(() =>remainder = value,);
+                                }),
+
                  ],
                )),
              ),
@@ -344,9 +349,11 @@ Map<DateTime, List<Event>> selectedEvents={};
                           mysql.insertevent(title.text,date,time);
                           //Navigator.push(context, MaterialPageRoute(builder: (context)=> ListScreen())                 
                           print(selectedEvents.entries);
-                           SmolleyNotification().dailyNotification(time, 'Hey there! Do you know what time it is?', title.text);
-                           SmolleyNotification().dailyNotification(time.subtract(Duration(minutes: 30)), 'Hey there! Its almost Time', title.text);
+                          SmolleyNotification.ShowNotification(title: 'Hey there! Do you know what time it is?', body: title.text, fn: flutterLocalNotificationsPlugin, time: time);
+                          //  SmolleyNotification().dailyNotification(time, 'Hey there! Do you know what time it is?', title.text);
+                          //  SmolleyNotification().dailyNotification(time.subtract(Duration(minutes: 30)), 'Hey there! Its almost Time', title.text);
                            Navigator.of(context).pop();
+                           getdata();
                          }
                           }, 
                           child: Text("Add Event")),
