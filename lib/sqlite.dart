@@ -60,7 +60,7 @@ class sqlite{
           return await db.insert(table,{
             Title: myTitle,
             notes: note,
-            dateplustime: DateFormat('dd-MMM-yyyy kk:mm:ss a').format(DateTime.now()),
+            dateplustime: DateFormat('dd MMM kk:mm:ss a').format(DateTime.now()),
           });
         }
          Future<int> insertevent(String myTitle,DateTime date, DateTime time) async{
