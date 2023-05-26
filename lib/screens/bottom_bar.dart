@@ -19,7 +19,8 @@ class _BottomBarState extends State<BottomBar> {
 
   List _screens = [
     Home(),
-    ListScreen(),
+    //ListScreen(),
+    Todo(),
     Search(),
     CreateNote(),
     Calculator()
@@ -54,7 +55,7 @@ class _BottomBarState extends State<BottomBar> {
 
             BottomNavigationBarItem(
               icon: Icon(Icons.task),
-              label: 'To Do'
+              label: 'Day Planner'
             ),
 
             BottomNavigationBarItem(

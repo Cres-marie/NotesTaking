@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
+import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -24,6 +25,8 @@ class Todo extends StatefulWidget {
 }
 
 class _TodoState extends State<Todo> {
+
+  //bool isChecked = false;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final mysql = sqlite();
   final popupmessage = authenticate();
@@ -69,7 +72,7 @@ Map<DateTime, List<Event>> selectedEvents={};
   }
  
   }
-  List _getEventsfromDay(DateTime date){
+  List<Event>_getEventsfromDay(DateTime date){
     
     return selectedEvents[date] ?? [];
   }
@@ -117,153 +120,278 @@ Map<DateTime, List<Event>> selectedEvents={};
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-         flexibleSpace: ClipRect(child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(color: Colors.transparent,),),),
-        title: Center(child:Text('To Do', style: bheadings,),),
-         backgroundColor: Colors.white.withAlpha(150),
-        actions: [
-          IconButton(onPressed: (){
-             Navigator.push(context, MaterialPageRoute(builder: (context) => ListScreen(),));
-          }, icon: Icon(Icons.calendar_month, color:biconcolor ,))
-        ],
-      ),
+         
+      //   //title:Text('To Do', style: bheadings,),
+      //
+         backgroundColor:  Color.fromARGB(255, 214, 118, 58),
+         elevation: 0.0,
+         automaticallyImplyLeading: false,
+      //   leading: IconButton(onPressed: (){
+      //        Navigator.push(context, MaterialPageRoute(builder: (context) => BottomAppBar(),));
+      //     }, icon: Image.asset('images/backicon.png'),
+      //   ),
+      //   // actions: [
+      //   //   IconButton(onPressed: (){
+      //   //      Navigator.push(context, MaterialPageRoute(builder: (context) => BottomAppBar(),));
+      //   //   }, icon: Image.asset('images/backicon.png'),
+      //   //   )
+      //   // ],
+       ),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(parent:AlwaysScrollableScrollPhysics()),
         child: SafeArea(
-          child: Column(
-            children: [
-              TableCalendar(
-                calendarStyle: CalendarStyle(
-                  defaultDecoration:  BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  weekendDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  todayDecoration: BoxDecoration(
-                     shape: BoxShape.rectangle,
-                    color: Colors.purpleAccent,
-                    borderRadius: BorderRadius.circular(10),
-                  ) ,
-                  selectedDecoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    color: Colors.redAccent,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  
-                ),
-                headerStyle: HeaderStyle(
-                  formatButtonVisible: true,
-                  titleCentered: true,
-                  formatButtonDecoration: BoxDecoration(
-                    color:  Color(0xFF52B848),
-                    borderRadius: BorderRadius.circular(10)
-                  )
-                ),
-                currentDay: DateTime.now(),
-                firstDay: DateTime.now(),
-                lastDay: DateTime.utc(2230, 3, 14),
-                focusedDay:  _focusedDay,
-                headerVisible: true,
-                daysOfWeekVisible: true,
-                eventLoader: _getEventsfromDay,
-                calendarBuilders: CalendarBuilders(
-                  markerBuilder: (context, day, events) {
-                    if (events.isEmpty) return SizedBox();
-                               return Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(top: 20),
-                                          padding: const EdgeInsets.all(1),
-                                          child: Container(
-                                            // height: 7,
-                                            width: 5,
-                                            decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.primaries[Random().nextInt(Colors.primaries.length)]),
-                                          ),
-                                        ),
-                                        Container(margin: const EdgeInsets.only(top: 20),child: Text(events.length.toString(), style: TextStyle(fontSize:10 ),))
-                                      ],
-                                    );
-                  }
-                ),
-                availableCalendarFormats: {
-                  CalendarFormat.month: 'Month',
-                  //CalendarFormat.week: 'Week',
-                },
-                selectedDayPredicate: (day) {
+            child: Column(
+              children: [
+                Column(
+                  //mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     
-                  return isSameDay(_selectedDay, day);
-                },
-                onDaySelected: (selectedDay, focusedDay) {
-                  if (!isSameDay(_selectedDay, selectedDay)){
-                    // Call `setState()` when updating the selected day
-                    setState(() {
-                    _selectedDay = selectedDay;
-                   _focusedDay = focusedDay; // update `_focusedDay` here as well
-                  });
-                 
-                  }
-               },
-                calendarFormat: _calendarFormat,
-                  onFormatChanged: (format) {
-                    if (_calendarFormat != format) {
-                     // Call `setState()` when updating calendar format 
-                      setState(() {
-                      _calendarFormat = format;
-                      });
-                    };
-                  },
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 214, 118, 58),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(18),
+                          bottomRight: Radius.circular(18)
+                        )
+                      ),
+                      padding: bpadding,
+                      //margin: bmargintop,
                       
-                  onPageChanged: (focusedDay) {
-                  // No need to call `setState()` here
-                    _focusedDay = focusedDay;
-                  },
                       
-                  
-                //availableGestures: AvailableGestures.none,
-                //CalendarFormat.month : 'Month',
-              ),
-          
-          
-              ..._getEventsfromDay(_focusedDay).map((event) => Container(
-                 height: 120,
-                 width: 150,
-                 margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
-                 padding: EdgeInsets.all(5),
-                 decoration: BoxDecoration(
-                   color: Colors.primaries[Random().nextInt(Colors.primaries.length)].withOpacity(0.6),
-                   borderRadius: BorderRadius.circular(10),
-                   boxShadow: [BoxShadow(
-                    color: Color.fromARGB(255, 223, 211, 211),
-                    offset: Offset(0.0, 4.0),
-                    blurRadius: 6.0,
-                    ),
-                     ],
-                 ),
-                 child: Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     ListTile(
-                       splashColor: Colors.black,
-                       style: ListTileStyle.drawer,
-                       title: Center(child: Text('TITLE: '+event.title,style: TextStyle(fontWeight: FontWeight.bold))),
-                     ),
-                     Expanded(child: Text(event.time,maxLines: 2, overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white),)),
+                      child: TableCalendar(
+                        calendarStyle: CalendarStyle(
+                          defaultTextStyle: TextStyle(fontSize: 15, color: Colors.white),
+                          //titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                          defaultDecoration:  BoxDecoration(
+                            
+                            //shape: BoxShape.rectangle,
+                            //borderRadius: BorderRadius.circular(10),
+                            //color: Colors.grey[200]
+                            //color: Colors.transparent, // Change the color to your desired background color
+                            //border: Border.all(color: Colors.grey), // Add a border to each day
+                          ),
+                          weekendDecoration: BoxDecoration(
+                            //shape: BoxShape.rectangle,
+                            //borderRadius: BorderRadius.circular(10),
+                            //color: Color.fromARGB(255, 183, 149, 98)
+      
+                          ),
+                          todayDecoration: BoxDecoration(
+                             shape: BoxShape.circle,
+                            color:  Color.fromARGB(255, 148, 61, 7),
+                            //borderRadius: BorderRadius.circular(10),
+                          ) ,
+                          selectedDecoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color.fromARGB(255, 233, 148, 95),
+                            //borderRadius: BorderRadius.circular(10),
+                          ),
+                          
+                        ),
+                        headerStyle: HeaderStyle(
+                          formatButtonVisible: true,
+                          titleCentered: true,
+                          formatButtonDecoration: BoxDecoration(
+                            color: Color.fromARGB(255, 233, 148, 95),
+                            borderRadius: BorderRadius.circular(10)
+                          ),
+      
+                          titleTextStyle: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         
-                   ],
-                 ),
-               ),)
-          
-            ],
+                        daysOfWeekStyle: DaysOfWeekStyle(
+                          weekendStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+        //fontWeight: FontWeight.bold,
+                        ),
+      
+                        weekdayStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+        //fontWeight: FontWeight.bold,
+                        ),
+                      ),
+      
+      
+                        currentDay: DateTime.now(),
+                        firstDay: DateTime.now(),
+                        lastDay: DateTime.utc(2230, 3, 14),
+                        focusedDay:  _focusedDay,
+                        headerVisible: true,
+                        daysOfWeekVisible: true,
+                        eventLoader: _getEventsfromDay,
+                        calendarBuilders: CalendarBuilders(
+                          markerBuilder: (context, day, events) {
+                            if (events.isEmpty) return SizedBox();
+                                       return Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Container(
+                                                  margin: const EdgeInsets.only(top: 20),
+                                                  padding: const EdgeInsets.all(1),
+                                                  child: Container(
+                                                    // height: 7,
+                                                    width: 5,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.primaries[Random().nextInt(Colors.primaries.length)]),
+                                                  ),
+                                                ),
+                                                Container(margin: const EdgeInsets.only(top: 20),child: Text(events.length.toString(), style: TextStyle(fontSize:10 ),))
+                                              ],
+                                            );
+                          }
+                        ),
+                        availableCalendarFormats: {
+                          CalendarFormat.month: 'Month',
+                          //CalendarFormat.week: 'Week',
+                        },
+                        selectedDayPredicate: (day) {
+                            
+                          return isSameDay(_selectedDay, day);
+                        },
+                        onDaySelected: (selectedDay, focusedDay) {
+                          if (!isSameDay(_selectedDay, selectedDay)){
+                            // Call `setState()` when updating the selected day
+                            setState(() {
+                            _selectedDay = selectedDay;
+                           _focusedDay = focusedDay; // update `_focusedDay` here as well
+                          });
+                         
+                          }
+                       },
+                        calendarFormat: _calendarFormat,
+                          onFormatChanged: (format) {
+                            if (_calendarFormat != format) {
+                             // Call `setState()` when updating calendar format 
+                              setState(() {
+                              _calendarFormat = format;
+                              });
+                            };
+                          },
+                              
+                          onPageChanged: (focusedDay) {
+                          // No need to call `setState()` here
+                            _focusedDay = focusedDay;
+                          },
+                              
+                          
+                        //availableGestures: AvailableGestures.none,
+                        //CalendarFormat.month : 'Month',
+                      ),
+                    ),
+      
+                    SizedBox(height: 18,),
+      
+                    Container(
+                      padding: bpadding,
+                      child: Text('Tasks', style: bheadings)
+                    )
+                  ],
+                ),
             
+            
+                ..._getEventsfromDay(_focusedDay).map((event) => SingleChildScrollView(
+              
+                  child: Container(
+                    padding: EdgeInsets.only(right: 20, left: 20, top: 10),
+                  
+                    child: AnimatedOpacity(
+                      opacity: event.isChecked ? 0.5 : 1.0,
+                      duration: Duration(seconds: 2),
+                      child: Container(
+                         height: 120,
+                         width: 550,
+                         margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
+                         
+                         padding: bpadding,
+                         //padding: EdgeInsets.all(5),
+                         decoration: BoxDecoration(
+                            color:  Color.fromARGB(255, 230, 190, 165),
+                           //color: Colors.primaries[Random().nextInt(Colors.primaries.length)].withOpacity(0.6),
+                           borderRadius: BorderRadius.circular(10),
+                           boxShadow: [BoxShadow(
+                            color: Color.fromARGB(255, 223, 211, 211),
+                            offset: Offset(0.0, 4.0),
+                            blurRadius: 6.0,
+                            ),
+                             ],
+                         ),
+                         child: Column(
+                           crossAxisAlignment: CrossAxisAlignment.start,
+                           children: [
+                            
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: AnimatedOpacity(
+                                    opacity: event.isChecked ? 0.5 : 1.0, // Adjust the opacity based on the isChecked value,
+                                    duration: Duration(seconds: 2),// Set the duration of the fade animation
+                                    child: Text(
+                                      '${event.title[0].toUpperCase()}${event.title.substring(1)}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20,
+                                        decoration: event.isChecked
+                                          ? TextDecoration.lineThrough // Apply strikethrough style when isChecked is true
+                                          : TextDecoration.none, // Remove decoration when isChecked is false
+                              
+                                      ) 
+                                    ),
+                                  ),
+                                ),
+                    
+                                Checkbox(
+                                  value: event. isChecked ?? false, 
+                                  onChanged: (value){
+                                      setState(() {
+                                        event.isChecked = value ?? false;
+
+                                        if (event.isChecked) {
+
+                                          //deleterecord(event.id);
+                      
+                                        setState(() {
+                        
+                                    });
+                                  }
+                                      });
+                                  }
+                                )
+                              ],
+                            ),
+                                      
+                            Text(event.time, style: TextStyle(fontSize: 12,) ),
+                                      
+                                      
+                                      
+                            
+                            // ListTile(
+                            //    splashColor: Colors.black,
+                            //    style: ListTileStyle.drawer,
+                            //    //title: Center(child: Text(event.title,style: TextStyle(fontWeight: FontWeight.bold))),
+                                      
+                            //  ),
+                            //  Expanded(child: Text(event.time,maxLines: 2, overflow: TextOverflow.ellipsis,style: TextStyle(color: Colors.white),)),
+                                
+                           ],
+                         ),
+                       ),
+                    ),
+                  ),
+                ),)
+            
+              ],
+              
+            ),
           ),
-        ),
       ),
+      
     
       floatingActionButton: FloatingActionButton(
         onPressed: (){
@@ -281,7 +409,7 @@ Map<DateTime, List<Event>> selectedEvents={};
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Enter Your Event'),
-                Icon(Icons.calendar_month, color:  Color(0xFF52B848),)
+                //Icon(Icons.calendar_month, color:  Color(0xFF52B848),)
               ],
             ),
              content: SingleChildScrollView(
@@ -301,36 +429,51 @@ Map<DateTime, List<Event>> selectedEvents={};
                            controller: title,
                            decoration: InputDecoration(
                              hintText: 'Remind me to...',
-                             suffixIcon: Icon(Icons.create_sharp),
-                             border: UnderlineInputBorder()
+                             suffixIcon: Icon(Icons.create_sharp, color: bselected,),
+                             border: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: biconcolor
+                              )
+                             )
                            ),
                          ),
                         SizedBox(height: 20,),
-                         Text('SELECT TIME', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
+                         Text('Select Time', style: TextStyle( fontSize: 20),),
                          SizedBox(height: 20,),
                          Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Expanded(
-                              child: InkWell(
-                                onTap: () async{
-                                    final mydate = await pickdatetime(time, true);
-                                    if(mydate == null) return null;
-                                    final dDay = DateTime.utc(mydate.year, mydate.month, mydate.day).toUtc();
-                                    print(dDay);
-                                    setState((){
-                                      date = dDay;
-                                    } );
-                                },
-                                child: Text('Date: '+DateFormat.yMMMd().format(date))),
-                            ),
+                            // Expanded(
+                            //   child: InkWell(
+                            //     onTap: () async{
+                            //         final mydate = await pickdatetime(time, true);
+                            //         if(mydate == null) return null;
+                            //         final dDay = DateTime.utc(mydate.year, mydate.month, mydate.day).toUtc();
+                            //         print(dDay);
+                            //         setState((){
+                            //           date = dDay;
+                            //         } );
+                            //     },
+                            //     child: Text('Date: '+DateFormat.yMMMd().format(date))),
+                            // ),
                             InkWell(
                               onTap: () async{
                                  final mydate = await pickdatetime(time, false);
                                  if(mydate == null) return null;
                                  setState(()=> time = DateTime(date.year, date.month, date.day, mydate.hour, mydate.minute));
                               },
-                              child: Text('Time: '+DateFormat.Hm().format(time))),
+                              child:  Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(Icons.schedule),
+                                  SizedBox(width: 15),
+                                  Text(DateFormat('h:mm a').format(time)),
+                                ],
+                              ),
+                              //Text('Time: '+DateFormat.Hm().format(time))
+                              
+                            ),
                           ],
                          ),
                           SizedBox(height: 20,),
@@ -338,9 +481,13 @@ Map<DateTime, List<Event>> selectedEvents={};
                          
                            SwitchListTile(
                             title: Text('Remind me daily'),
-                            value: remainder, onChanged: (value){
-                                  setState(() =>remainder = value,);
-                                }),
+                            activeColor: bselected,
+                            value: remainder, 
+                            onChanged: (value){
+                                setState(
+                                  () =>remainder = value,
+                                );
+                            }),
 
                  ],
                )),
@@ -359,11 +506,15 @@ Map<DateTime, List<Event>> selectedEvents={};
                            getdata();
                          }
                           }, 
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(biconcolor),
+                          ),
                           child: Text("Add Event")),
                            TextButton(
                      onPressed: (){
                          Navigator.of(context).pop();
-            }, child: Text("Cancel"))
+            }, 
+            child: Text("Cancel", style: TextStyle(color: biconcolor),))
              ],
            );
             },

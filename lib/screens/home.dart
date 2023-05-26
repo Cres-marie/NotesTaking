@@ -51,7 +51,7 @@ class _HomeState extends State<Home> {
         body: SingleChildScrollView(
           child: Container(
             //margin: bmargintop,
-            padding: bpadding,
+            padding: EdgeInsets.only(right: 20, left: 20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +185,7 @@ class _HomeState extends State<Home> {
                              getdata();
                    },
                    child: Card(
-                     
+                    
                      margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                      //color: Colors.primaries[index % Colors.primaries.length].shade400,
@@ -193,7 +193,7 @@ class _HomeState extends State<Home> {
                      elevation: 6,
 
                      child: Padding(
-                        padding: EdgeInsets.all(8),
+                        padding: EdgeInsets.all(18),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
