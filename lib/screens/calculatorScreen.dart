@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../constants.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class Calculator extends StatefulWidget {
   const Calculator({super.key});
@@ -8,191 +10,150 @@ class Calculator extends StatefulWidget {
 }
 
 class _CalculatorState extends State<Calculator> {
-
-  
-  //Button Widget
-  Widget numButton(String btnText, Color btnColor, Color txtColor) {
-    return ElevatedButton(
-      onPressed: () {
-        calculate(btnText);
-      },
-      child: btnText == '+' || btnText == '-' || btnText == 'x' || btnText == '/'
-        ? Text(
-            btnText,
-            style: TextStyle(
-              fontSize: 25,
-              color: Colors.white,
-            ),
-          )
-        : Text(
-            btnText,
-            style: TextStyle(
-              fontSize: 25,
-              color: txtColor,
-            ),
-          ),
-      style: ElevatedButton.styleFrom(
-        fixedSize: Size(70, 70),
-        shape: CircleBorder(),
-        primary: btnColor,
-      ),
-    );
-  }
-
-
+  String userInput = "";
+  String result = "0";
+  List<String> buttonList=[
+    'AC',
+    ')',
+    '(',
+    '/',
+    '7',
+    '8',
+    '9',
+    '*',
+    '4',
+    '5',
+    '6',
+    '+',
+    '1',
+    '2',
+    '3',
+    '-',
+    'C',
+    '0',
+    '.',
+    '=',
+  ];
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      backgroundColor: Colors.black,
-        body: SingleChildScrollView(
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.black, Colors.grey[900]!],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        margin: EdgeInsets.only(top:200),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(
-                      
-                      (operation.isEmpty && text.isNotEmpty) ? text : ((operation.isEmpty) ? text : '$text '),
-                      textAlign: TextAlign.left,
-                      style: TextStyle(color: Colors.white, fontSize: 80),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  numButton("C", Colors.grey, Colors.black),
-                numButton("+/-", Colors.grey, Colors.black),
-                numButton("%", Colors.grey, Colors.black),
-                numButton("/", Colors.orange, Colors.white),
-              ],
+      backgroundColor: Color(0xFF1d2630),
+      body: Container(
+        padding: bpadding,
+        margin: bmargintop,
+        child: Column(
+         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            
+            Container(
+              padding: EdgeInsets.all(20),
+              alignment: Alignment.centerRight,
+              child: Text(userInput, style: TextStyle(fontSize: 32, color: Colors.white),),
+            ),
+            Container(
+              padding: EdgeInsets.all(20),
+              alignment: Alignment.centerRight,
+              child: Text(result, style: TextStyle(fontSize: 48, color: Colors.white, fontWeight: FontWeight.bold),),
+            ),
+            Divider(color: Colors.white,),
+            Expanded(
+              child: Container(
                 
+                padding: EdgeInsets.all(10),
+                child: GridView.builder(
+                  itemCount: buttonList.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, crossAxisSpacing: 12, mainAxisSpacing: 12), 
+                itemBuilder:(context, index){
+                  return CustomButton(buttonList[index]);
+                }),
               ),
-              SizedBox(height: 10),
-              Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                numButton("7", (Colors.grey[850])!, Colors.white),
-                numButton("8", (Colors.grey[850])!, Colors.white),
-                numButton("9", (Colors.grey[850])!, Colors.white),
-                numButton("x", Colors.orange, Colors.white),
-              ],
-            ),
-              SizedBox(height: 10),
-              Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                numButton("4", (Colors.grey[850])!, Colors.white),
-                numButton("5", (Colors.grey[850])!, Colors.white),
-                numButton("6", (Colors.grey[850])!, Colors.white),
-                numButton("-", Colors.orange, Colors.white),
-              ],
-            ),
-              SizedBox(height: 10),
-              Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                numButton("1", (Colors.grey[850])!, Colors.white),
-                numButton("2", (Colors.grey[850])!, Colors.white),
-                numButton("3", (Colors.grey[850])!, Colors.white),
-                numButton("+", Colors.orange, Colors.white),
-              ],
-            ),
-              
-            SizedBox(height: 10,),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(28, 12, 90, 12),
-                    child: Text(
-                      "0",
-                      style: TextStyle(
-                        fontSize: 35,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    shape: StadiumBorder(),
-                    primary: (Colors.grey[850])!,
-                  ),
-                ),
-                numButton(".", (Colors.grey[850])!, Colors.white),
-                numButton("=", Colors.orange, Colors.white),
-              ],
-            ),
-            SizedBox(height: 10),
+            )
           ],
-        ),
-            
-            //SizedBox(height: 10),
-            
-          ),
         ),
       ),
     );
   }
-
-   // Logic
-  int firstNumber = 0;
-  int secondNumber = 0;
-  String result = "";
-  String text = "";
-  String operation = "";
-
-  void calculate(String btnText) {
-    if (btnText == "C") {
-      result = "";
-      text = "";
-      firstNumber = 0;
-      secondNumber = 0;
-    } else if (btnText == "+" ||
-        btnText == "-" ||
-        btnText == "x" ||
-        btnText == "/") {
-      firstNumber = int.parse(text);
-      result = "";
-      operation = btnText;
-    } else if (btnText == "=") {
-      secondNumber = int.parse(text);
-      if (operation == "+") {
-        result = (firstNumber + secondNumber).toString();
-      }
-      if (operation == "-") {
-        result = (firstNumber - secondNumber).toString();
-      }
-      if (operation == "x") {
-        result = (firstNumber * secondNumber).toString();
-      }
-      if (operation == "/") {
-        result = (firstNumber ~/ secondNumber).toString();
-      }
-    } else {
-      result = int.parse(text + btnText).toString();
-    }
-    setState(() {
-      text = result;
-    });
+  Widget CustomButton(String text){
+    return InkWell(
+      splashColor: Color(0xFF1d2630),
+      onTap:() {
+        setState(() {
+           handlebutton(text);
+        });
+       
+      },
+      child: Ink(
+        decoration: BoxDecoration(
+          color: getBgcolor(text),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withOpacity(0.1),
+              blurRadius: 3,
+              spreadRadius: 0.5,
+              offset: Offset(-3, -3)
+            )
+          ]
+        ),
+        child: Center(child: Text(text, style: TextStyle(
+          color: getcolor(text),
+          fontSize: 30, fontWeight: FontWeight.bold),)),
+      ),
+    );
   }
+  getcolor(String text){
+    if(text == "/" || text =="*" || text == "+" || text == "-" || text == "C" || text == ")" || text == "("){
+      return Color.fromARGB(255, 252,100,100);
+    }
+    return Colors.white;
+  }
+    getBgcolor(String text){
+    if(text == "AC"){
+      return Color.fromARGB(255, 252,100,100);
+    }
+     if(text == "="){
+      return Color.fromARGB(255, 104,204,159);
+    }
+    return Color(0xFF1d2630);
+  }
+  handlebutton(String text){
+    if(text == "AC"){
+      userInput = "";
+      result = "0";
+      return;
+    }
+    if(text == "C"){
+      if(userInput.isNotEmpty){
+        userInput  = userInput.substring(0, userInput.length -1);
+        
+        return;
+      }
+      else return;
+    }
+    if(text == "="){
+      result = Calculate();
+      userInput = result;
+       if(userInput.endsWith(".0")){
+        userInput = userInput.replaceAll(".0", "");
+        return;
+      }
+      if(result.endsWith(".0")){
+        result = result.replaceAll(".0", "");
+        return;
+      }
+    }
+    userInput = userInput + text;
+  }
+  String Calculate(){
+    try{
+      var exp = Parser().parse(userInput);
+      var evaluation = exp.evaluate(EvaluationType.REAL, ContextModel());
+      return evaluation.toString();
 
+    }
+    catch(e){
+      return "Error";
+    }
+  }
 }

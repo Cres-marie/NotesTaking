@@ -2,7 +2,10 @@
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+
+import 'notification.dart';
 class sqlite{
         static final _dbname = 'mynotes.db';
         static final _dbversion = 2;
@@ -57,15 +60,15 @@ class sqlite{
           return await db.insert(table,{
             Title: myTitle,
             notes: note,
-            dateplustime: DateFormat('dd-MMM-yyyy kk:mm:ss a').format(DateTime.now()),
+            dateplustime: DateFormat('dd MMM kk:mm:ss a').format(DateTime.now()),
           });
         }
-         Future<int> insertevent(String myTitle,DateTime Eventtime, DateTime start) async{
+         Future<int> insertevent(String myTitle,DateTime date, DateTime time) async{
           final db = await database;
           return await db.insert(eventtable,{
             eventTitle: myTitle,
-            eventtime: Eventtime.toString(),
-            starttime: DateFormat('dd-MMM-yyyy kk:mm:ss a').format(start),
+            eventtime: date.toString(),
+            starttime: DateFormat('dd-MMM-yyyy kk:mm:ss a').format(time),
           });
         }
         Future<List<Map<String,dynamic>>> getdata() async{
@@ -76,6 +79,13 @@ class sqlite{
           final db = await database;
           return await db.query(eventtable, orderBy: starttime+' DESC');
         }
+        // void NotificationforEvent(String title, DateTime time) async {
+        //   final db = await database;
+        //   final List<Map<String, dynamic>> event = await db.query(eventtable, where: 'Title = ?', whereArgs: [title]);
+        //   int pk = event.first['_id'] as int;
+        //   SmolleyNotification().dailyNotification(pk,time, 'Hey there! Do you know what time it is?', title);
+        //   SmolleyNotification().dailyNotification(pk,time.subtract(Duration(minutes: 30)), 'Hey there! Its almost Time', title);
+        // }
         Future<int> deleteall() async{
           final db = await database;
           return await db.delete(table);
@@ -84,9 +94,14 @@ class sqlite{
           final db = await database;
           return await db.delete(table, where: '_id=?', whereArgs: [id]);
         }
-        Future<bool> update(int id, String note) async{
+         Future<int> deleteevent(int id) async{
           final db = await database;
-          await db.update(table, {notes: note, dateplustime: DateFormat('dd-MMM-yyyy kk:mm:ss a').format(DateTime.now())}, where: '_id=?', whereArgs: [id]);
+          return await db.delete(eventtable, where: '_id=?', whereArgs: [id]);
+        }
+        
+        Future<bool> update(int id, String title, String body) async{
+          final db = await database;
+          await db.update(table, {Title: title,notes: body, dateplustime: DateFormat('dd-MMM-yyyy kk:mm:ss a').format(DateTime.now())}, where: '_id=?', whereArgs: [id]);
           return Future.value(true);
         }
         Future<List<Map<String, dynamic>>> weekAgoNotes() async {
