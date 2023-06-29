@@ -16,57 +16,103 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final mysql = sqlite();
   final auth = authenticate();
-  List<Map<String,dynamic>> thisweek=[];
-  List<Map<String,dynamic>> weeksago=[];
+  bool loading = false;
+  String greeting = '';
+  List<Map<String,dynamic>> notes=[];
+  List<Map<String, dynamic>> filtered_list =[];
   Future<void> getdata() async{
-    List<Map<String, dynamic>> weekAgonotes = await mysql.getdata();
-    List<Map<String, dynamic>> weeksbefore = await mysql.weeksbefore();
+    setState(()=> loading =true);
+    //await Future.delayed(Duration(seconds: 1));
+    List<Map<String, dynamic>> mynotes = await mysql.getdata();
+
     setState(() {
-      thisweek = weekAgonotes;
-      weeksago = weeksbefore;
+      notes = mynotes;
+      filtered_list = mynotes;
     });
-    
+    setState(()=> loading = false);
+  }
+    void _greetnigga(){
+    var hour = DateTime.now().hour;
+    if(hour<12){
+      setState(() {
+        greeting = 'Good morning,';
+      });
+      
+    } else if(hour<18){
+      setState(() {
+        greeting = 'Good afternoon,';
+      });
+      
+    } else{
+      setState(() {
+       greeting = 'Good evening,';
+      });
+
+    }
+  }
+  void Searchevent(String query){
+  final suggestions = notes.where((note){
+      final title = note['Title'].toString().toLowerCase();
+      final body = note['notes'].toString().toLowerCase();
+      final input = query.toLowerCase();
+      return title.contains(input);
+    }).toList();
+    setState(() => filtered_list = suggestions);
   }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getdata();
+    _greetnigga();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      extendBodyBehindAppBar: true,
         appBar: AppBar(
-
-          title: Text('Notes', style: bheadings),
-          backgroundColor: backgroundColor,
+          flexibleSpace: ClipRect(child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(color: Colors.transparent,),),),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(greeting, style: TextStyle(color: Colors.black, fontSize: 28),),
+              Row(
+                children: [
+                  
+                  Text('Smolleys', style: bheadings),
+                ],
+              ),
+            ],
+          ),
+          backgroundColor: Colors.white.withAlpha(150),
           elevation: 0.0,
-          
-  //centerTitle: true,
+          centerTitle: true,
           automaticallyImplyLeading: false,
+          
 
         ),
 
         body: SingleChildScrollView(
-          child: Container(
-            //margin: bmargintop,
-            padding: EdgeInsets.only(right: 20, left: 20),
+        physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        scrollDirection: Axis.vertical,
+          padding:  bpadding,
+          child: SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
+          
                 //Text('Notes', style: bheadings),
-
+          
                 //SizedBox(height: 24,),
-
-
+          
+          
                 Container(
-
-                margin: EdgeInsets.symmetric(horizontal: 0, vertical: 10),
+          
+                margin: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(20),
                       color: Colors.white,
                       boxShadow: [
                       BoxShadow(
@@ -77,21 +123,22 @@ class _HomeState extends State<Home> {
                       ),
                     ],
                   ),
-
+          
                 child: TextField(
                       //controller: search,
                       onChanged: (value){
-                        //Searchevent(value);
+                        Searchevent(value);
                       },
-                      
+                      style: TextStyle(color: Colors.white, fontSize: 20),
                       decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.search, color: Color.fromARGB(255, 85, 86, 85),),
+                          prefixIcon: Icon(Icons.search, color: Colors.white),
                           hintText: 'Search for note',
+                          hintStyle: TextStyle(color: Colors.white),
                           filled: true,
                           //fillColor: biconcolor,
                           fillColor: Color.fromARGB(255, 69, 143, 72),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),    
+                            borderRadius: BorderRadius.circular(20),    
                           ),
                           contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           focusedBorder: OutlineInputBorder(
@@ -102,225 +149,119 @@ class _HomeState extends State<Home> {
                         ),
                     ),
               ),
-
-                // InkWell(
-                //   onTap: () {},
-                //   child: Image.asset('images/search.png'),
-                // ),
-
+          // Container(
+          //       height: 80,
+          //       decoration: BoxDecoration(
+          //         image: DecorationImage(image: AssetImage('images/started.png'), alignment: Alignment.center, fit: BoxFit.fill)
+          //       ),
+          //     ),
                 SizedBox(height: 24,),
-
-                Row(
-                  children: [
-
-                    Container(
-                      height: 50,
-                      width: 160,
-                      child: ElevatedButton.icon(
-                        onPressed: (){}, 
-                        icon: Image.asset('images/notes.png', height: 50,), 
-                        label: Text('All Notes', style: TextStyle(color: Colors.black),),
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.white),
-                          shape:MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            )
-                          )
-                        ),
-                      ),
-                    ),
-
-                    SizedBox(width: 20,),
-
-                    Container(
-                      height: 50,
-                      width: 160,
-                      child: ElevatedButton.icon(
-                        onPressed: (){}, 
-                        icon: Image.asset('images/trash.png', height: 50,), 
-                        label: Text('Trash', style: TextStyle(color: Colors.black),),
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.white),
-                          shape:MaterialStateProperty.all(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10)
-                            )
-                          )
-                        ),
-                      ),
-                    )
-
-                  ],
-                ),
-
-                SizedBox(height: 24,),
-
-                Text('Recent Notes' ,style: bheadings,),
-                SizedBox(height: 24,),
-                  
-               thisweek.isEmpty?
-               Container(
-                height: 300,
-                decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage('images/emptynote.png'), alignment: Alignment.center, fit: BoxFit.fill)
-                ),
-              ): 
-               SizedBox(
-                height: 200,
-                 child: Expanded(
-                 // flex: 1,
-                   child: ListView.builder(
-                   // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-                    shrinkWrap: true,
-                    itemCount: thisweek.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context,index){
-                      return GestureDetector(
-                   onTap: () {
-                     //Navigator.push(context, MaterialPageRoute(builder: (context) => mynote(note: thisweek[index]),));
-                   },
-                   onLongPress: (){
-                      auth.deletenotemessage(context,thisweek[index]['_id']);
-                             getdata();
-                   },
-                   child: Card(
-                    
-                     margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
-                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                     //color: Colors.primaries[index % Colors.primaries.length].shade400,
-                     color: cardColors[index % cardColors.length],
-                     elevation: 6,
-
+            Text('Yours Notes' ,style: bheadings,),
+                
+              SizedBox(
+                height: MediaQuery.of(context).size.height ,
+                 child: ListView.builder(
+                 // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                  shrinkWrap: true,
+                  itemCount: filtered_list.length,
+                  scrollDirection: Axis.vertical,
+                  physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  itemBuilder: (context,index){
+                    return GestureDetector(
+                 onTap: () {
+                   Navigator.push(context, MaterialPageRoute(builder: (context) => CreateNote(note: filtered_list[index]),));
+                 },
+                 onLongPress: (){
+                    auth.deletenotemessage(context,filtered_list[index]['_id'], true);
+                           getdata();
+                 },
+                 child: Card(
+                   
+                   margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
+                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                   //color: Colors.primaries[index % Colors.primaries.length].shade400,
+                   color: cardColors[index % cardColors.length],
+                   elevation: 6,
+                 
+                   child: Container(
+                    width: 150,
+                    height: 130,
                      child: Padding(
-                        padding: EdgeInsets.all(18),
+                        padding: EdgeInsets.all(8),
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${thisweek[index]['Title'][0].toUpperCase()}${thisweek[index]['Title'].substring(1)}',
+                              '${notes[index]['Title'][0].toUpperCase()}${filtered_list[index]['Title'].substring(1)}',
                                //thisweek[index]['Title'],
                               style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.black,),
                             ),
-                            Divider(height: 10, thickness: 4, color: Colors.grey),
+                            Divider(height: 10, thickness:2 ,),
                             SizedBox(height: 12),
-                            Expanded(
-                              child: Text(
-                                 thisweek[index]['notes'],
-                                  maxLines: null,
-                                  overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: Colors.black,fontSize: 16,letterSpacing: 0.5, height: 1.2,),
-                              ),
+                            Text(
+                               filtered_list[index]['notes'],
+                                maxLines: null,
+                                overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: Colors.black,fontSize: 16,letterSpacing: 0.5, height: 1.2,),
                             ),
                             SizedBox(height: 10),
                             
                             Text(
-                              thisweek[index]['time'].toString(),
+                              filtered_list[index]['time'].toString(),
                               style: TextStyle(fontSize: 12, color: Color.fromARGB(255, 36, 35, 35),letterSpacing: 0.5,),
                             ),
                           ],
                         ),
                       ),
-                     
-                    //  child: Column(
-                    //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    //    children: [
-                    //      ListTile(
-                    //        splashColor: Colors.black,
-                    //        style: ListTileStyle.drawer,
-                    //        title: Center(child: Text('TITLE: '+thisweek[index]['Title'], style: TextStyle(fontWeight: FontWeight.bold),)),
-                    //      ),
-                         
-                    //      Expanded(child: Text(thisweek[index]['notes'],maxLines: 4, style: TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis,)),
-                    //      Text(thisweek[index]['time'].toString(),),
-                    //    ],
-                    //  ),
                    ),
-                      );
-                      
-                    },),
-                 ),
-               ),
-               SizedBox(height: 25,),
-            Text('Past Notes' ,style: bheadings,),
-                
-              weeksago.isEmpty?
-              Container(
-                height: 300,
-                decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage('images/emptynote.png'), alignment: Alignment.center, fit: BoxFit.fill)
-                ),
-              )
-               :SizedBox(
-                
-                height: 325,
-                 child: Expanded(
-                 // flex: 1,
-                   child: ListView.builder(
-                   // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-                   //dragStartBehavior: DragStartDetails,
-                    shrinkWrap: true,
-                    itemCount: weeksago.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context,index){
-                      return GestureDetector(
-                   onTap: () {
-                     //Navigator.push(context, MaterialPageRoute(builder: (context) => mynote(note: weeksago[index]),));
-                   },
-                   onLongPress: (){
-                      auth.deletenotemessage(context,weeksago[index]['_id']);
-                             getdata();
-                   },
-                   child: Container(
-                     height: 150,
-                     width: 150,
-                     margin: EdgeInsets.symmetric( horizontal: 2, vertical: 5),
-                     padding: EdgeInsets.all(5),
-                     decoration: BoxDecoration(
-                       color: Colors.primaries[index % Colors.primaries.length].shade400,
-                       borderRadius: BorderRadius.circular(10),
-                       boxShadow: [BoxShadow(
-                        color: Color.fromARGB(255, 223, 211, 211),
-                        offset: Offset(0.0, 4.0),
-                        blurRadius: 6.0,
-                        ),
-                         ],
-                     ),
-                     child: Column(
+                   
+                  //  child: Column(
+                  //    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  //    children: [
+                  //      ListTile(
+                  //        splashColor: Colors.black,
+                  //        style: ListTileStyle.drawer,
+                  //        title: Center(child: Text('TITLE: '+thisweek[index]['Title'], style: TextStyle(fontWeight: FontWeight.bold),)),
+                  //      ),
                        
-                       children: [
-                         ListTile(
-                           splashColor: Colors.black,
-                           style: ListTileStyle.drawer,
-                           title: Center(child: Text(weeksago[index]['time'])),
-                         ),
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                           children: [
-                             Text(weeksago[index]['_id'].toString(),),
-                             SizedBox(width: 30,),
-                             Expanded(child: Text(weeksago[index]['notes'],maxLines: 2, overflow: TextOverflow.ellipsis,)),
-                            
-                           ],
-                         ),
-                       ],
-                     ),
-                   ),
-                      );
-                      
-                    },),
+                  //      Expanded(child: Text(thisweek[index]['notes'],maxLines: 4, style: TextStyle(color: Colors.white), overflow: TextOverflow.ellipsis,)),
+                  //      Text(thisweek[index]['time'].toString(),),
+                  //    ],
+                  //  ),
                  ),
+                    );
+                    
+                  },),
                ),
                 
-
+          
               ],
               
             ),
           ),
           
-        )
+        ),
         //Text('Home'),
-
+        floatingActionButton: FloatingActionButton.extended(onPressed: () { Navigator.push(context, MaterialPageRoute(builder: (context)=> CreateNote(note: {},))); },
+        backgroundColor: Color(0xFF52B848),
+        
+        icon: Icon(Icons.create),
+        label:  Text('Create Note')
+        ),
     );
   }
+  Widget buildNoteShimmer() =>  Shimmer.fromColors(
+              baseColor: Colors.black,
+              highlightColor: Colors.grey[300]!,
+              child: Container(
+              width: 150,
+              height: 110,
+              child: Padding(
+              padding: EdgeInsets.all(8),
+                    
+              ),
+              ),
+  );
 }
+
