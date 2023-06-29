@@ -7,25 +7,29 @@ import 'package:notestaking/screens/listScreen.dart';
 import 'package:notestaking/screens/searchScreen.dart';
 import 'package:notestaking/screens/todoScreen.dart';
 
+
 class BottomBar extends StatefulWidget {
-  const BottomBar({super.key});
+  int index;
+  BottomBar({required this.index});
 
   @override
   State<BottomBar> createState() => _BottomBarState();
 }
 
 class _BottomBarState extends State<BottomBar> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
 
   List _screens = [
     Home(),
-    //ListScreen(),
     Todo(),
-    Search(),
-    CreateNote(),
     Calculator()
   ];
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _selectedIndex = widget.index;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,32 +51,23 @@ class _BottomBarState extends State<BottomBar> {
             });
           },
           items: [
-
+        
             BottomNavigationBarItem(
               icon: Icon(Icons.note),
               label: 'Notes'
             ),
-
+        
             BottomNavigationBarItem(
               icon: Icon(Icons.task),
               label: 'Day Planner'
             ),
-
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search),
-              label: 'Search'
-            ),
-
-            BottomNavigationBarItem(
-              icon: Icon(Icons.create), 
-              label: 'Create Note'
-            ),
-
-            BottomNavigationBarItem(
+            
+             BottomNavigationBarItem(
               icon: Icon(Icons.calculate),
               label: 'Calculator'
             ),
-
+          
+        
           ]
         ),
 
