@@ -5,7 +5,6 @@ import 'package:notestaking/screens/home.dart';
 //import 'package:notestaking/screens/marie1.dart';
 import 'package:notestaking/sqlite.dart';
 import 'package:notestaking/sqlite.dart';
-
 class authenticate {
   final mysql = sqlite();
 
@@ -22,11 +21,11 @@ void displaymessagefromtop(BuildContext context, String message, bool success){
      
   ],
  ),
- backgroundColor: success? Color.fromARGB(255, 19, 175, 24): Color.fromARGB(255, 236, 31, 16)
+ backgroundColor: success? Color.fromARGB(255, 103, 222, 156): Color.fromARGB(255, 167, 77, 70)
  );
  ScaffoldMessenger.of(context).showSnackBar(Snackbar);
 }
-void deletenotemessage(BuildContext context, int note){
+void deletenotemessage(BuildContext context, int note, bool NoteOrEvent){
   showModalBottomSheet(
     backgroundColor: Color.fromARGB(255, 185, 181, 181),
     elevation: 30,
@@ -38,13 +37,15 @@ void deletenotemessage(BuildContext context, int note){
     ),
     context: context, 
   builder: (context){
+
     return Container(
       height: 150,
      margin: EdgeInsets.symmetric(vertical: 15),
       child: Column(
         children: [
           ListTile(
-            title: Center(child: Text("Are you sure you want to delete this note?")),
+            title: NoteOrEvent? Center(child: Text("Are you sure you want to delete this Note")): Center(child: Text("Are you sure you want to delete this Event"))
+
           ),
           ButtonBar(
             alignment: MainAxisAlignment.spaceEvenly,
@@ -65,19 +66,29 @@ void deletenotemessage(BuildContext context, int note){
     );
   }).then((value) async {
     if(value !=null && value) {
-      final record = await mysql.deleterecord(note);
+    if(NoteOrEvent) {
+      final record = await mysql.deleterecord(note); 
       if(record> 0){
-           displaymessagefromtop(context, 'Deleted record', true);
+           displaymessagefromtop(context, 'Deleted Note', true);
                     }
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomBar()));
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomBar(index: 0,)));
     }
     else{
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomBar()));
+      final record = await mysql.deleteevent(note);
+      if(record> 0){
+           displaymessagefromtop(context, 'Deleted Event', true);
+                    }
+      Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomBar(index: 1,)));
+    }  
+    
+      
+    }
+    else{
+      // NoteOrEvent? Navigator.of(context).pop():
+      // Navigator.push(context, MaterialPageRoute(builder: (context)=> BottomBar(index: 1,)));
+      Navigator.of(context).pop();
     }
   });
 }
 
   
-
-
-}
